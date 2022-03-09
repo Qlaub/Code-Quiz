@@ -77,6 +77,11 @@ const chooseQuestion = function() {
     }
   }
 
+  //if no questions left end the game
+  if (questionsLeft.length === 0) {
+    return false;
+  }
+
   //choose random question within questions left
   let questionsLeftIndex = randomNum(0, questionsLeft.length - 1);
   let questionsIndex = questionsLeft[questionsLeftIndex]
@@ -99,21 +104,68 @@ const checkQuestion = function(event) {
     currentTime = parseInt(timeEl.textContent);
     timeEl.textContent = `${currentTime - 10}`;
 
-    //object to feed into clear screen
-    currentScreen = {
-      id: "question-container"
-    }
-
     return newQuestion(false);
   }
   return newQuestion(true);
+}
+
+const endGame = function() {
+
+  //clears screen of questions
+  const screenObj = {
+    id: 'question-container',
+  }
+  clearScreen(screenObj);
+
+  //create container for end screen
+  const endScreenEl = document.createElement('section');
+  endScreenEl.id = 'end-container';
+
+  //end screen header
+  const endHeaderEl = document.createElement('h2');
+  endHeaderEl.textContent = "All done!";
+  endScreenEl.appendChild(endHeaderEl);
+
+  //end screen final score display
+  const endScoreEl = document.createElement('p');
+  const finalScore = parseInt(timeEl.innerText);
+  endScoreEl.textContent = `Your final score is ${finalScore}`;
+  endScreenEl.appendChild(endScoreEl);
+
+  //container to hold user initials submission
+  const submitContainerEl = document.createElement('div');
+  submitContainerEl.id = 'submit-container'
+  endScreenEl.appendChild(submitContainerEl);
+
+  //create 'Enter initials' text
+  const initialsEl = document.createElement('span');
+  initialsEl.textContent = 'Enter initials:';
+  submitContainerEl.appendChild(initialsEl);
+
+  //input element
+  const inputEl = document.createElement('input');
+  inputEl.id = 'initials-input';
+  submitContainerEl.appendChild(inputEl);
+
+  //button element
+  const submitBtnEl = document.createElement('button');
+  submitBtnEl.id = 'submit-btn';
+  submitBtnEl.innerText = "Submit"
+  submitContainerEl.appendChild(submitBtnEl);
+
+  mainEl.appendChild(endScreenEl);
+
+  //display time as final score
+  //create submit box for entering as high score
+  //stores high score
+  //then takes user to high score page
 }
 
 //creates a new question at random on the screen
 const newQuestion = function(lastAnswerCorrect) {
   const question = chooseQuestion();
 
-  //only create the whole page for the first question
+  //only create question page html on first question
   if (!document.getElementById('question-container')) {
     //html section containing question info
     const sectionEl = document.createElement('section');
@@ -149,7 +201,12 @@ const newQuestion = function(lastAnswerCorrect) {
     for (let i=0; i < answerBtnEls.length; i++) {
       answerBtnEls[i].addEventListener('click', checkQuestion)
     }
-  } else { //if not first question, update page html to next question
+  } else if (question === false) {
+    //if no questions left, go to end screen
+    endGame();
+
+  } else { 
+    //if not first question, update page html to next question
     //update heading
     const headingEl = document.querySelector('.question-header');
     headingEl.textContent = Object.values(question)[1];
@@ -165,7 +222,7 @@ const newQuestion = function(lastAnswerCorrect) {
 
 const startGame = function() {
   //clearScreen function expects object
-  titleObj = {
+  const titleObj = {
     id: "title-screen",
   }
 

@@ -105,3 +105,51 @@ main {
 .answer-btn:hover {
   background-color: #bd60e7;
 }
+
+#end-container {
+  display: flex;
+  flex-direction: column;
+  width: 55%;
+  align-items: flex-start;
+  margin: 70px;
+}
+
+#end-container h2 {
+  font-size: 46px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+#end-container p {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+#submit-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+#submit-container span {
+  font-size: 40px;
+  margin-right: 25px;
+}
+
+#initials-input {
+  height: 100%;
+  width: 50%;
+  font-size: 40px;
+}
+
+#submit-btn {
+  border-style: none;
+  color: white;
+  background-color: #45278b;
+  border-radius: 10px;
+  font-size: 32px;
+  letter-spacing: .4px;
+  padding: 8px 24px;
+  margin-left: 25px;
+}
