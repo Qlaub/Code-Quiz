@@ -10,7 +10,45 @@ const timeEl = document.getElementById("time");
 const titleScreenEl = document.getElementById("title-screen");
 const startGameBtn = document.getElementById("start-game");
 
-//clears current content(s)
+//random number generation
+const randomNum = function(min, max) {
+  let num = Math.floor(Math.random() * (max + 1 - min)) + min;
+  return num;
+}
+
+//quiz questions
+let questions = [
+  {
+    //keeps track of whether the question has been answered by the user
+    answered: false,
+    //text of question
+    questionText: "Commonly used data types DO NOT include:",
+    //answers paired with their boolean value
+    answerText: [["strings", false], ["booleans", false], ["alerts", true], ["numbers", false]],
+  },
+  {
+    answered: false,
+    questionText: "The condition in an if / else statement is enclosed with _________.",
+    answerText: [["quotes", false], ["curly brackets", false], ["parenthesis", true], ["square brackets", false]],
+  },
+  {
+    answered: false,
+    questionText: "Arrays in JavaScript can be used to store",
+    answerText: [["numbers and strings", false], ["other arrays", false], ["booleans", false], ["all of the above", true]],
+  },
+  {
+    answered: false,
+    questionText: "String values must be enclosed within _____ when being assigned to variables.",
+    answerText: [["commas", false], ["curly brackets", false], ["quotes", true], ["parenthesis", false]],
+  },
+  {
+    answered: false,
+    questionText: "A very useful tool used during development and debugging for printing content to the debugger is:",
+    answerText: [["JavaScript", false], ["terminal/bash", false], ["for loops", false], ["console.log", true]],
+  }
+]
+
+//clears current content(s) on screen
 const clearScreen = function(objEl) {
   //create array filled with object values
   objValues = Object.values(objEl);
@@ -25,6 +63,35 @@ const clearScreen = function(objEl) {
   return;
 }
 
+const chooseQuestion = function() {
+  let questionsLeft = [];
+
+  //iterate through all questions
+  for (let i=0; i < questions.length; i++) {
+    //has question been answered
+    answered = Object.values(questions[i])[0]
+    //if question hasn't been answered, add to array
+    if (!answered) {
+      questionsLeft.push(i)
+    }
+  }
+
+  //index of chosen question
+  choiceIndex = randomNum(0, questionsLeft.length - 1);
+  //selects choice within our question array
+  choice = questions[choice];
+
+  return choice;
+}
+
+//creates a new question on the screen
+const newQuestion = function() {
+  let question = chooseQuestion();
+  //create content on screen
+  //create eventlistener for click on buttons
+  //displays correct on incorrect on screen
+}
+
 const startGame = function(event) {
   event.preventDefault();
 
@@ -34,6 +101,7 @@ const startGame = function(event) {
   }
   //clear title screen content
   clearScreen(titleObj);
+  newQuestion();
 }
 
 startGameBtn.addEventListener('click', startGame)
