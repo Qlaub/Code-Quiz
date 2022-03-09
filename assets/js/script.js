@@ -77,43 +77,90 @@ const chooseQuestion = function() {
     }
   }
 
-  //index of chosen question
-  choiceIndex = randomNum(0, questionsLeft.length - 1);
-  //selects choice within our question array
-  choice = questions[choiceIndex];
+  //choose random question within questions left
+  let questionsLeftIndex = randomNum(0, questionsLeft.length - 1);
+  let questionsIndex = questionsLeft[questionsLeftIndex]
+  let choice = questions[questionsIndex];
+
+  //mark question as having been asked
+  choice.answered = true;
 
   return choice;
 }
 
-//creates a new question on the screen
+const checkQuestion = function(event) {
+  //was users answer correct
+  userSelection = this.id;
+  console.log(userSelection)
+
+  //if not
+  if (userSelection === "answer-false") {
+    //penalize 10 seconds
+    currentTime = parseInt(timeEl.textContent);
+    timeEl.textContent = `${currentTime - 10}`;
+
+    //object to feed into clear screen
+    currentScreen = {
+      id: "question-container"
+    }
+
+    return newQuestion(false);
+  }
+  return newQuestion(true);
+}
+
+//creates a new question at random on the screen
 const newQuestion = function(lastAnswerCorrect) {
   const question = chooseQuestion();
 
-  //html section containing question info
-  const sectionEl = document.createElement('section');
-  sectionEl.className = 'question-container';
+  //only create the whole page for the first question
+  if (!document.getElementById('question-container')) {
+    //html section containing question info
+    const sectionEl = document.createElement('section');
+    sectionEl.className = 'question-container';
+    sectionEl.id = 'question-container'
 
-  //h2 question header creation
-  const headingEl = document.createElement('h2');
-  headingEl.className = 'question-header';
-  headingEl.textContent = Object.values(question)[1];
-  sectionEl.appendChild(headingEl)
+    //h2 question header creation
+    const headingEl = document.createElement('h2');
+    headingEl.className = 'question-header';
+    headingEl.textContent = Object.values(question)[1];
+    sectionEl.appendChild(headingEl)
 
-  //div button container
-  const answerContainer = document.createElement('div');
-  answerContainer.className = 'answer-container';
-  sectionEl.appendChild(answerContainer);
+    //div button container
+    const answerContainer = document.createElement('div');
+    answerContainer.className = 'answer-container';
+    sectionEl.appendChild(answerContainer);
 
-  //button creation one at a time
-  for (let i=0; i < 4; i++) {
-    let answerBtn = document.createElement('button');
-    answerBtn.className = 'answer-btn';
-    answerBtn.textContent = `${i+1}. ${Object.values(question)[2][i][0]}`
-    answerContainer.appendChild(answerBtn);
+    //button creation one at a time
+    for (let i=0; i < 4; i++) {
+      let answerBtn = document.createElement('button');
+      answerBtn.className = 'answer-btn';
+      answerBtn.textContent = `${i+1}. ${Object.values(question)[2][i][0]}`;
+      //id is either 'answer-true' or 'answer-false'
+      answerBtn.id = `answer-${Object.values(question)[2][i][1]}`;
+      answerContainer.appendChild(answerBtn);
+    }
+
+    //append section to main body of html
+    mainEl.appendChild(sectionEl);
+
+    answerBtnEls = document.querySelectorAll(".answer-btn");
+    //click event listener added to buttons
+    for (let i=0; i < answerBtnEls.length; i++) {
+      answerBtnEls[i].addEventListener('click', checkQuestion)
+    }
+  } else { //if not first question, update page html to next question
+    //update heading
+    const headingEl = document.querySelector('.question-header');
+    headingEl.textContent = Object.values(question)[1];
+
+    //update answer buttons one at a time
+    const answerBtnArray = document.querySelectorAll('.answer-btn')
+    for (let i=0; i < 4; i++) {
+      answerBtnArray[i].textContent = `${i+1}. ${Object.values(question)[2][i][0]}`;
+      answerBtnArray[i].id = `answer-${Object.values(question)[2][i][1]}`;
+    }
   }
-
-  //append section to main body of html
-  mainEl.appendChild(sectionEl);
 }
 
 const startGame = function() {
@@ -124,6 +171,9 @@ const startGame = function() {
 
   //clear title screen content
   clearScreen(titleObj);
+  //adds 75 seconds to the clock
+  timeEl.textContent = '75';
+  //pulls up first question
   newQuestion(null);
 }
 

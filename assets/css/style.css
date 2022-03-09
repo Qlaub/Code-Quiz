@@ -24,6 +24,7 @@ header {
 .time-box {
   font-size: 30px;
   font-weight: bold;
+  display: flex;
 }
 
 main {
