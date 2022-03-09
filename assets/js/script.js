@@ -9,6 +9,7 @@ const highScoreEl = document.getElementById("highscore");
 const timeEl = document.getElementById("time");
 const titleScreenEl = document.getElementById("title-screen");
 const startGameBtn = document.getElementById("start-game");
+const mainEl = document.getElementById("main");
 
 //random number generation
 const randomNum = function(min, max) {
@@ -33,7 +34,7 @@ let questions = [
   },
   {
     answered: false,
-    questionText: "Arrays in JavaScript can be used to store",
+    questionText: "Arrays in JavaScript can be used to store:",
     answerText: [["numbers and strings", false], ["other arrays", false], ["booleans", false], ["all of the above", true]],
   },
   {
@@ -79,29 +80,51 @@ const chooseQuestion = function() {
   //index of chosen question
   choiceIndex = randomNum(0, questionsLeft.length - 1);
   //selects choice within our question array
-  choice = questions[choice];
+  choice = questions[choiceIndex];
 
   return choice;
 }
 
 //creates a new question on the screen
-const newQuestion = function() {
-  let question = chooseQuestion();
-  //create content on screen
-  //create eventlistener for click on buttons
-  //displays correct on incorrect on screen
+const newQuestion = function(lastAnswerCorrect) {
+  const question = chooseQuestion();
+
+  //html section containing question info
+  const sectionEl = document.createElement('section');
+  sectionEl.className = 'question-container';
+
+  //h2 question header creation
+  const headingEl = document.createElement('h2');
+  headingEl.className = 'question-header';
+  headingEl.textContent = Object.values(question)[1];
+  sectionEl.appendChild(headingEl)
+
+  //div button container
+  const answerContainer = document.createElement('div');
+  answerContainer.className = 'answer-container';
+  sectionEl.appendChild(answerContainer);
+
+  //button creation one at a time
+  for (let i=0; i < 4; i++) {
+    let answerBtn = document.createElement('button');
+    answerBtn.className = 'answer-btn';
+    answerBtn.textContent = `${i+1}. ${Object.values(question)[2][i][0]}`
+    answerContainer.appendChild(answerBtn);
+  }
+
+  //append section to main body of html
+  mainEl.appendChild(sectionEl);
 }
 
-const startGame = function(event) {
-  event.preventDefault();
-
+const startGame = function() {
   //clearScreen function expects object
   titleObj = {
     id: "title-screen",
   }
+
   //clear title screen content
   clearScreen(titleObj);
-  newQuestion();
+  newQuestion(null);
 }
 
 startGameBtn.addEventListener('click', startGame)
