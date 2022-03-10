@@ -160,32 +160,55 @@ main {
 
 #score-parent-container {
   display: flex;
-  height: 100vh;
+  margin-top: 10vh;
   align-items: center;
+  width: 100%;
+  justify-content: center;
 }
 
 #score-child-container {
   display: flex;
   flex-direction: column;
+  width: 50%;
+  margin: auto 0;
 }
 
 #score-header {
-
+  text-align: start;
+  font-size: 54px;
+  margin-bottom: 10px;
 }
 
 #score-list {
-
+  margin: 10px 0;
+  list-style: none;
 }
 
 .high-score {
-
+  padding: 15px;
+  background-color: #d9d3e9;
+  width: 100%;
+  font-size: 32px;
+  margin: 4px 0;
 }
 
 #high-score-button-container {
+  margin-top: 10px;
   display: flex;
   justify-content: flex-start;
 }
 
 .high-score-buttons {
-  
+  border-style: none;
+  color: white;
+  background-color: #45278b;
+  border-radius: 10px;
+  font-size: 32px;
+  letter-spacing: .4px;
+  padding: 8px 24px;
+  margin-right: 15px;
+}
+
+.high-score-buttons:hover {
+  background-color: #bd60e7;
 }

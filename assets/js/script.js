@@ -158,7 +158,7 @@ const highScorePage = function() {
   scoreChildContainerEl.appendChild(scoreHeaderEl);
 
   //unordered list
-  const scoreListEl = document.createElement('ol');
+  const scoreListEl = document.createElement('ul');
   scoreListEl.id = 'score-list'
   scoreChildContainerEl.appendChild(scoreListEl);
 
@@ -169,7 +169,7 @@ const highScorePage = function() {
   for (let i=0; i < scores.length; i++) {
     let listItemEl = document.createElement('li');
     listItemEl.className = 'high-score';
-    listItemEl.textContent = `${scores[i][0]} - ${scores[i][1]}`;
+    listItemEl.textContent = `${i+1}. ${scores[i][0]} - ${scores[i][1]}`;
     scoreListEl.appendChild(listItemEl);
   }
 
