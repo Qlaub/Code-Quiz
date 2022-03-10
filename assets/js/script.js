@@ -109,6 +109,71 @@ const checkQuestion = function(event) {
   return newQuestion(true);
 }
 
+const compareScores = function(currentScore, highScores) {
+  for (let i=0; i < highScores.length; i++) {
+    const highScoreKey = "high score";
+    //if high score list is already full  
+    if (highScores.length === 5) {
+      if (highScores[i][1] < currentScore[1]) {
+        //and if user score is a new high score, add it and get rid of bottom score
+        highScores.splice(i, 0, currentScore);
+        highScores.pop();
+        console.log("high score list full, new score added")
+        localStorage.setItem(highScoreKey, JSON.stringify(highScores));
+        return;
+      }
+      //user has a new high score
+    } else if (highScores[i][1] < currentScore[1]) {
+      highScores.splice(i, 0, currentScore);
+      console.log("new high score")
+      localStorage.setItem(highScoreKey, JSON.stringify(highScores));
+      return;
+      //user has a tied high score to be added to the end of the high score list
+    } else if (highScores[i][1] === currentScore[1] && highScores.length === i-1) {
+      highScores.push(currentScore);
+      console.log("high score added to end of list")
+      localStorage.setItem(highScoreKey, JSON.stringify(highScores));
+      return;
+      //user has a tied high score
+    } else if (highScores[i][1] === currentScore[1]) {
+      highScores.splice(i+1, 0, currentScore);
+      console.log("tied high score inserted")
+      localStorage.setItem(highScoreKey, JSON.stringify(highScores));
+      return;
+    }
+  }
+}
+
+const highScorePage = function() {
+  //asdf;
+}
+
+const logScore = function() {
+  const userInitials = document.getElementById('initials-input').value
+  const userScore = timeEl.innerText;
+  const userData = [userInitials, userScore];
+
+  //guard clause if user hasn't entered anything into input field
+  if (!userInitials) return alert("Please enter your initials!");
+
+  //retrieve high score storage
+  const highScoreKey = "high score";
+  let currentHighScores = JSON.parse(localStorage.getItem(highScoreKey));
+
+  //if no high scores exist, create high score local storage with value being an array (to hold top 5 high scores)
+
+  if (!currentHighScores) {
+    const highScore = [userData];
+    localStorage.setItem(highScoreKey, JSON.stringify(highScore));
+    console.log("No current high scores, creating local storage")
+  } else {
+    //if high scores already exist, see if user has new high score
+    console.log("Comparing user score to current high scores")
+    compareScores(userData, currentHighScores);
+  }
+  return highScorePage();
+}
+
 const endGame = function() {
 
   //clears screen of questions
@@ -152,7 +217,10 @@ const endGame = function() {
   submitBtnEl.id = 'submit-btn';
   submitBtnEl.innerText = "Submit"
   submitContainerEl.appendChild(submitBtnEl);
+  //listens for click on submit button
+  submitBtnEl.addEventListener('click', logScore);
 
+  //append everything to main page
   mainEl.appendChild(endScreenEl);
 
   //display time as final score
