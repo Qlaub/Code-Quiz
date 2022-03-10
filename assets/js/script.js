@@ -144,7 +144,62 @@ const compareScores = function(currentScore, highScores) {
 }
 
 const highScorePage = function() {
-  //asdf;
+  //multiple containing elements in order to take advantage of flex centering property
+  const scoreParentContainerEl = document.createElement('section');
+  scoreParentContainerEl.id = 'score-parent-container';
+  const scoreChildContainerEl = document.createElement('section');
+  scoreChildContainerEl.id = 'score-child-container';
+  scoreParentContainerEl.appendChild(scoreChildContainerEl);
+
+  //header text
+  const scoreHeaderEl = document.createElement('h2');
+  scoreHeaderEl.id = 'score-header';
+  scoreHeaderEl.innerText = 'High scores';
+  scoreChildContainerEl.appendChild(scoreHeaderEl);
+
+  //unordered list
+  const scoreListEl = document.createElement('ol');
+  scoreListEl.id = 'score-list'
+  scoreChildContainerEl.appendChild(scoreListEl);
+
+  const highScoreKey = "high score";
+  const scores = JSON.parse(localStorage.getItem(highScoreKey));
+
+  //list items
+  for (let i=0; i < scores.length; i++) {
+    let listItemEl = document.createElement('li');
+    listItemEl.className = 'high-score';
+    listItemEl.textContent = `${scores[i][0]} - ${scores[i][1]}`;
+    scoreListEl.appendChild(listItemEl);
+  }
+
+  //buttons container
+  const btnContainerEl = document.createElement('div');
+  btnContainerEl.id = 'high-score-button-container';
+  scoreChildContainerEl.appendChild(btnContainerEl);
+
+  //buttons
+  const backBtnEl = document.createElement('button');
+  const clearBtnEl = document.createElement('button');
+  backBtnEl.className = 'high-score-buttons';
+  clearBtnEl.className = 'high-score-buttons';
+  backBtnEl.textContent = 'Go back';
+  clearBtnEl.textContent = 'Clear high scores';
+  btnContainerEl.appendChild(backBtnEl);
+  btnContainerEl.appendChild(clearBtnEl);
+
+  mainEl.appendChild(scoreParentContainerEl);
+}
+
+const scoreSubmit = function() {
+  logScore();
+  const page = {
+    id1: 'header',
+    id2: 'end-container',
+  };
+  clearScreen(page);
+  highScorePage();
+  return;
 }
 
 const logScore = function() {
@@ -170,7 +225,6 @@ const logScore = function() {
     console.log("Comparing user score to current high scores")
     compareScores(userData, currentHighScores);
   }
-  return highScorePage();
 }
 
 const endGame = function() {
@@ -217,7 +271,7 @@ const endGame = function() {
   submitBtnEl.innerText = "Submit"
   submitContainerEl.appendChild(submitBtnEl);
   //listens for click on submit button
-  submitBtnEl.addEventListener('click', logScore);
+  submitBtnEl.addEventListener('click', scoreSubmit);
 
   //append everything to main page
   mainEl.appendChild(endScreenEl);

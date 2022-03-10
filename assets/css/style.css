@@ -157,3 +157,35 @@ main {
 #submit-btn:hover {
   background-color: #bd60e7;
 }
+
+#score-parent-container {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+}
+
+#score-child-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#score-header {
+
+}
+
+#score-list {
+
+}
+
+.high-score {
+
+}
+
+#high-score-button-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.high-score-buttons {
+  
+}
