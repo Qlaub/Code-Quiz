@@ -10,6 +10,7 @@ const timeEl = document.getElementById("time");
 const titleScreenEl = document.getElementById("title-screen");
 const startGameBtn = document.getElementById("start-game");
 const mainEl = document.getElementById("main");
+const headerEl = document.getElementById('header');
 
 //random number generation
 const randomNum = function(min, max) {
@@ -95,7 +96,7 @@ const chooseQuestion = function() {
 
 const checkQuestion = function(event) {
   //was users answer correct
-  userSelection = this.id;
+  const userSelection = this.id;
   console.log(userSelection)
 
   //if not
@@ -143,7 +144,36 @@ const compareScores = function(currentScore, highScores) {
   }
 }
 
+const removeScores = function() {
+  const highScoreKey = 'high score';
+  localStorage.removeItem(highScoreKey);
+  alert('Scores Removed');
+}
+
+const playAgain = function() {
+  //git rid of high score screen
+  const scoreSection = {
+    id: 'score-parent-container'
+  }
+  clearScreen(scoreSection);
+  
+  headerEl.style.display = 'flex';
+  titleScreenEl.style.display = 'flex';
+  startGameBtn.addEventListener('click', startGame);
+  timeEl.textContent = '0';
+  questions.forEach((question) => {
+    console.log(question);
+    question.answered = false;
+  })
+  return;
+}
+
 const highScorePage = function() {
+  const questionPageEl = document.getElementById('score-parent-container')
+  if ((questionPageEl) && questionPageEl.style.display === "none") {
+    questionPageEl.style.display = 'flex';
+    return;
+  }
   //multiple containing elements in order to take advantage of flex centering property
   const scoreParentContainerEl = document.createElement('section');
   scoreParentContainerEl.id = 'score-parent-container';
@@ -179,13 +209,15 @@ const highScorePage = function() {
   scoreChildContainerEl.appendChild(btnContainerEl);
 
   //buttons
-  const backBtnEl = document.createElement('button');
+  const againBtnEl = document.createElement('button');
   const clearBtnEl = document.createElement('button');
-  backBtnEl.className = 'high-score-buttons';
+  againBtnEl.className = 'high-score-buttons';
   clearBtnEl.className = 'high-score-buttons';
-  backBtnEl.textContent = 'Go back';
+  againBtnEl.textContent = 'Play again';
   clearBtnEl.textContent = 'Clear high scores';
-  btnContainerEl.appendChild(backBtnEl);
+  againBtnEl.addEventListener('click', playAgain);
+  clearBtnEl.addEventListener('click', removeScores);
+  btnContainerEl.appendChild(againBtnEl);
   btnContainerEl.appendChild(clearBtnEl);
 
   mainEl.appendChild(scoreParentContainerEl);
@@ -198,8 +230,7 @@ const scoreSubmit = function() {
     id2: 'end-container',
   };
   clearScreen(page);
-  highScorePage();
-  return;
+  return highScorePage();
 }
 
 const logScore = function() {
@@ -225,6 +256,9 @@ const logScore = function() {
     console.log("Comparing user score to current high scores")
     compareScores(userData, currentHighScores);
   }
+  //clears user input
+  const inputEl = document.getElementById('initials-input');
+  inputEl.value = '';
 }
 
 const endGame = function() {
@@ -234,6 +268,13 @@ const endGame = function() {
     id: 'question-container',
   }
   clearScreen(screenObj);
+
+  //if page already exists, display it
+  const endEl = document.getElementById('end-container');
+  if ((endEl) && endEl.style.display === 'none') {
+    endEl.style.display = 'flex';
+    return;
+  }
 
   //create container for end screen
   const endScreenEl = document.createElement('section');
@@ -285,9 +326,14 @@ const endGame = function() {
 //creates a new question at random on the screen
 const newQuestion = function(lastAnswerCorrect) {
   const question = chooseQuestion();
+  const questionContainerEl = document.getElementById('question-container');
+  if ((questionContainerEl) && questionContainerEl.style.display === 'none') {
+    questionContainerEl.style.display = 'flex';
+  }
+
 
   //only create question page html on first question
-  if (!document.getElementById('question-container')) {
+  if (!questionContainerEl) {
     //html section containing question info
     const sectionEl = document.createElement('section');
     sectionEl.className = 'question-container';
