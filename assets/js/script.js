@@ -110,8 +110,9 @@ const checkQuestion = function(event) {
 }
 
 const compareScores = function(currentScore, highScores) {
+  let index = undefined;
+  const highScoreKey = "high score";
   for (let i=0; i < highScores.length; i++) {
-    const highScoreKey = "high score";
     //if high score list is already full  
     if (highScores.length === 5) {
       if (highScores[i][1] < currentScore[1]) {
@@ -128,19 +129,17 @@ const compareScores = function(currentScore, highScores) {
       console.log("new high score")
       localStorage.setItem(highScoreKey, JSON.stringify(highScores));
       return;
-      //user has a tied high score to be added to the end of the high score list
-    } else if (highScores[i][1] === currentScore[1] && highScores.length === i-1) {
-      highScores.push(currentScore);
-      console.log("high score added to end of list")
-      localStorage.setItem(highScoreKey, JSON.stringify(highScores));
-      return;
-      //user has a tied high score
+      //log last index of tied high score
     } else if (highScores[i][1] === currentScore[1]) {
-      highScores.splice(i+1, 0, currentScore);
-      console.log("tied high score inserted")
-      localStorage.setItem(highScoreKey, JSON.stringify(highScores));
-      return;
+      index = i
     }
+  }
+  //update tied high score into lowest tied spot
+  if (index != undefined) {
+    highScores.splice(index+1, 0, currentScore);
+    console.log("tied high score inserted")
+    localStorage.setItem(highScoreKey, JSON.stringify(highScores));
+    return;
   }
 }
 
