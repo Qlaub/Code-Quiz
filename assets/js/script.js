@@ -1,10 +1,3 @@
-//alert("javascript loaded!")
-
-//when #start-game is clicked, display: none to all .title-screen content
-//dynamically create the next page layout
-//add time to timer
-//start counting down timer
-
 const viewHighScoreEl = document.getElementById("highscore");
 const viewScoreContainerEl = document.getElementById('highscore-box')
 const timeEl = document.getElementById("time");
@@ -22,7 +15,7 @@ const randomNum = function(min, max) {
   return num;
 }
 
-//decrements clock by one second
+//decrement clock by one second and check for expired time
 const secondDown = function() {
   secondsLeft = timeEl.textContent - 1;
   timeEl.textContent = `${secondsLeft}`;
@@ -31,14 +24,10 @@ const secondDown = function() {
   }
 }
 
-//quiz questions
 let questions = [
   {
-    //keeps track of whether the question has been answered by the user
     answered: false,
-    //text of question
     questionText: "Commonly used data types DO NOT include:",
-    //answers paired with their boolean value
     answerText: [["strings", false], ["booleans", false], ["alerts", true], ["numbers", false]],
   },
   {
@@ -64,30 +53,25 @@ let questions = [
 ]
 
 const startGame = function() {
-  //clearScreen function expects object
-  const titleObj = {
+  const startScreen = {
     id: "title-screen",
   }
-
-  //clear title screen content
-  clearScreen(titleObj);
+  //hides contents of start screen
+  hideScreen(startScreen);
   //adds 75 seconds to the clock
   timeEl.textContent = '75';
-  //pulls up first question
+  //selects first question
   newQuestion(null);
 }
 
-//clears current content(s) on screen
-const clearScreen = function(objEl) {
-  debugger;
-  //create array filled with object values
+const hideScreen = function(objEl) {
+  //elements to be hidden
   objValues = Object.values(objEl);
 
-  //iterate over array
   for (i=0; i < objValues.length; i++) {
-    //assign each screen element to be cleared to screenEl
+    //assign each screen element to be hidden to screenEl
     let screenEl = document.getElementById(objValues[i]);
-    //clear screen element
+    //hide screen element
     screenEl.style.display = "none";
   }
   return;
@@ -95,8 +79,9 @@ const clearScreen = function(objEl) {
 
 const showUserAnswer = function(answer) {
   let showContainer = document.getElementById('incorrect-correct-container')
-  //create show answer elements if on first question
-  if (answer === null && !showContainer) {
+
+  //create elements on first question on first load of page, but don't show yet
+  if (showContainer === null) {
     showContainer = document.createElement('section')
     showContainer.id = 'incorrect-correct-container';
     showContainer.style.display = 'none';
@@ -106,32 +91,38 @@ const showUserAnswer = function(answer) {
     showAnswer.id = 'incorrect-correct';
     showContainer.appendChild(showAnswer);
     return;
+  } else if (answer === null) {
+    //on second+ time through quiz hide elements on first question instead of creating
+    showContainer.style.display = 'none';
+    return;
   }
-  const previousAnswer = {
-    id: 'incorrect-correct',
-  }
+
+  //if answer from previous question is still on screen, make sure the setTimeout is cleared
   clearTimeout(answerClear);
-  clearScreen(previousAnswer);
+
   const showAnswer = document.getElementById('incorrect-correct');
+
+  //display incorrect or correct response
   if (answer) {
-    showContainer.style.display = 'flex';
-    showAnswer.style.display = 'flex';
     showAnswer.textContent = `Correct!`
   } else if (answer === false) {
-    showContainer.style.display = 'flex';
-    showAnswer.style.display = 'flex';
     showAnswer.textContent = `Incorrect!`
   }
+  showContainer.style.display = 'flex';
+  showAnswer.style.display = 'flex';
+
+  //set response to be cleared in 5 seconds
   answerClear = setTimeout(clearAnswer, 5000);
 }
 
+//stops displaying answer to previous question
 const clearAnswer = function() {
   const element = document.getElementById('incorrect-correct-container');
   if (element) {
     answer = {
       id: 'incorrect-correct-container',
     }
-    clearScreen(answer);
+    hideScreen(answer);
   }
 }
 
@@ -144,13 +135,15 @@ const newQuestion = function(lastAnswerBoolean) {
     clockCountdown = setInterval(secondDown, 1000);
   }
 
+  //question to be displayed selected
   const question = chooseQuestion();
   const questionContainerEl = document.getElementById('question-container');
+  //displays question
   if ((questionContainerEl) && questionContainerEl.style.display === 'none') {
     questionContainerEl.style.display = 'flex';
   }
 
-  //only create question page html on first question
+  //only create question page html elements on first time through quiz
   if (!questionContainerEl) {
     //html section containing question info
     const sectionEl = document.createElement('section');
@@ -218,7 +211,7 @@ const chooseQuestion = function() {
     }
   }
 
-  //if no questions left end the game
+  //if no questions left start end of game sequence
   if (questionsLeft.length === 0) {
     return false;
   }
@@ -234,14 +227,13 @@ const chooseQuestion = function() {
   return choice;
 }
 
-const checkQuestion = function(event) {
+const checkQuestion = function() {
   //was users answer correct
   const userSelection = this.id;
   console.log(userSelection)
 
-  //if not
   if (userSelection === "answer-false") {
-    //penalize 10 seconds
+    //penalize 10 seconds if incorrect
     currentTime = parseInt(timeEl.textContent);
     timeEl.textContent = `${currentTime - 10}`;
 
@@ -252,11 +244,13 @@ const checkQuestion = function(event) {
 
     return newQuestion(false);
   }
+
   return newQuestion(true);
 }
 
+//page user sees their score and enters initials
 const endGame = function() {
-  //clears timeout function
+  //stop the clock and reset it
   clearTimeout(clockCountdown);
   clockCountdown = undefined;
 
@@ -264,22 +258,23 @@ const endGame = function() {
   const screenObj = {
     id: 'question-container',
   }
-  clearScreen(screenObj);
+  hideScreen(screenObj);
 
-  //if page already exists, display it
+  //if html already exists, display it
   const endEl = document.getElementById('end-container');
   if ((endEl) && endEl.style.display === 'none') {
     endEl.style.display = 'flex';
-    //update score
+    //update score display
     let finalScore = parseInt(timeEl.innerText);
     const endScoreEl = document.getElementById('final-score-display');
     endScoreEl.textContent = `Your final score is ${finalScore}`;
-    //empty input field
+    //empty input field from last entry
     const inputEl = document.getElementById('initials-input');
     inputEl.value = '';
     return;
   }
 
+  //otherwise, html doesn't exist and we have to create it
   //create container for end screen
   const endScreenEl = document.createElement('section');
   endScreenEl.id = 'end-container';
@@ -321,14 +316,10 @@ const endGame = function() {
 
   //append everything to main page
   mainEl.appendChild(endScreenEl);
-
-  //display time as final score
-  //create submit box for entering as high score
-  //stores high score
-  //then takes user to high score page
 }
 
 const scoreSubmit = function() {
+  //checks if user has inputted anything into input box
   const check = logScore();
   if (check === false) {
     return;
@@ -336,22 +327,23 @@ const scoreSubmit = function() {
   return highScorePage();
 }
 
+//stores most recent user score
 const logScore = function() {
   const userInitials = document.getElementById('initials-input').value
   const userScore = timeEl.innerText;
   const userData = [userInitials, userScore];
 
-  //guard clause if user hasn't entered anything into input field
+  //if user hasn't entered anything into input field alert the user
   if (!userInitials) {
     alert("Please enter your initials!");
     return false;
   }
+
   //retrieve high score storage
   const highScoreKey = "high score";
   let currentHighScores = JSON.parse(localStorage.getItem(highScoreKey));
 
   //if no high scores exist, create high score local storage with value being an array (to hold top 5 high scores)
-
   if (!currentHighScores) {
     const highScore = [userData];
     localStorage.setItem(highScoreKey, JSON.stringify(highScore));
@@ -362,22 +354,22 @@ const logScore = function() {
     compareScores(userData, currentHighScores);
     return true;
   }
+
   //clears user input
-  const inputEl = document.getElementById('initials-input');
-  inputEl.value = '';
+  //const inputEl = document.getElementById('initials-input');
+  //inputEl.value = '';
   return true;
 }
 
 const highScorePage = function() {
-  debugger;
+  //stops the clock and resets it
   clearTimeout(clockCountdown);
   clockCountdown = undefined;
+
+  //make sure no previous answers are displayed on screen
   clearAnswer();
-  //finds first child element of main body that is being displayed
-  //needs to be fixed because it will find elements with display: none;
-  //going from questions to view high scores will not get rid of questions pages as a result
-  //find way to iterate through child objects and only select one with display: flex and have it NOT be a text node
-  //possible way is to have it match 'nodeType == Node.ELEMENT_NODE'
+
+  //iterate through the elements within <main> and select the one that is currently being displayed and isn't a text node
   const childrenEls = mainEl.children;
   let chosenChild = undefined;
   for (let i=0; i < childrenEls.length; i++) {
@@ -387,15 +379,21 @@ const highScorePage = function() {
       break;
     }
   }
+
   const page = {
     id1: 'header',
     id2: chosenChild.id,
   };
-  clearScreen(page);
+  //hides all elements from previous screen
+  hideScreen(page);
+
   const questionPageEl = document.getElementById('score-parent-container')
+  //if the high score page already exists, update it
   if ((questionPageEl) && questionPageEl.style.display === "none") {
     return updateScorePage();
   }
+
+  //if high score page doesn't already exist, we need to create it
   //multiple containing elements in order to take advantage of flex centering property
   const scoreParentContainerEl = document.createElement('section');
   scoreParentContainerEl.id = 'score-parent-container';
@@ -417,7 +415,7 @@ const highScorePage = function() {
   const highScoreKey = "high score";
   const scores = JSON.parse(localStorage.getItem(highScoreKey));
 
-  //list items
+  //if there already are high scores, display them as list elements in an unordered list
   if (scores != null) {
     for (let i=0; i < scores.length; i++) {
       let listItemEl = document.createElement('li');
@@ -426,6 +424,7 @@ const highScorePage = function() {
       scoreListEl.appendChild(listItemEl);
     }
   } else {
+    //if there aren't any high scores, display 'no high scores'
     let listItemEl = document.createElement('li');
     listItemEl.className = 'high-score';
     listItemEl.textContent = `No high scores!`;
@@ -453,6 +452,7 @@ const highScorePage = function() {
   return;
 }
 
+//selects where users current score should be placed on list of high scores
 const compareScores = function(currentScore, highScores) {
   let index = undefined;
   const highScoreKey = "high score";
@@ -467,16 +467,16 @@ const compareScores = function(currentScore, highScores) {
         localStorage.setItem(highScoreKey, JSON.stringify(highScores));
         return;
       }
-      //user has a new high score
+      //user has a new high score and list isn't full
     } else if (highScores[i][1] < currentScore[1]) {
       highScores.splice(i, 0, currentScore);
       console.log("new high score")
       localStorage.setItem(highScoreKey, JSON.stringify(highScores));
       return;
-      //log last index of tied high score
+      //user has a tied high score and score needs to be placed somewhere in the middle of the list
     } else if (highScores[i][1] === currentScore[1]) {
       index = i
-      //user has a high score that is lower than all other high scores
+      //user has a high score that is lowest on the list
     } else if (i+1 == highScores.length) {
       highScores.splice(highScores.length, 0, currentScore);
       console.log("lowest high score inserted")
@@ -484,7 +484,8 @@ const compareScores = function(currentScore, highScores) {
       return;
     }
   }
-  //update tied high score into lowest tied spot
+
+  //users tied high score gets placed below previous tied scores
   if (index != undefined) {
     highScores.splice(index+1, 0, currentScore);
     console.log("tied high score inserted")
@@ -494,15 +495,15 @@ const compareScores = function(currentScore, highScores) {
 }
 
 const playAgain = function() {
-  //git rid of high score screen
+  //get rid of high score screen
   const scoreSection = {
     id: 'score-parent-container'
   }
-  clearScreen(scoreSection);
+  hideScreen(scoreSection);
   
+  //sets up first screen again - displaying html, putting timer back to 0, and marking all questions as being unanswered
   headerEl.style.display = 'flex';
   titleScreenEl.style.display = 'flex';
-  startGameBtn.addEventListener('click', startGame);
   timeEl.textContent = '0';
   questions.forEach((question) => {
     console.log(question);
@@ -511,12 +512,14 @@ const playAgain = function() {
   return;
 }
 
+//removes high scores from high score page and deletes local storage
 const removeScores = function() {
   const highScoreKey = 'high score';
   localStorage.removeItem(highScoreKey);
   return updateScorePage();
 }
 
+//updates high score page
 const updateScorePage = function() {
   const questionPageEl = document.getElementById('score-parent-container')
   const scoreListEl = document.getElementById('score-list')
@@ -537,6 +540,7 @@ const updateScorePage = function() {
       scoreListEl.appendChild(listItemEl);
     }
   } else {
+    //if user doesn't have high scores, display 'no high scores'
     let listItemEl = document.createElement('li');
     listItemEl.className = 'high-score';
     listItemEl.textContent = `No high scores!`;
