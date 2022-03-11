@@ -117,7 +117,7 @@ const showUserAnswer = function(answer) {
     showContainer.style.display = 'flex';
     showAnswer.style.display = 'flex';
     showAnswer.textContent = `Correct!`
-  } else if (!answer) {
+  } else if (answer === false) {
     showContainer.style.display = 'flex';
     showAnswer.style.display = 'flex';
     showAnswer.textContent = `Incorrect!`
