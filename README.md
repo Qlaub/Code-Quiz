@@ -1,4 +1,4 @@
-# [Code-Quiz]https://qlaub.github.io/Code-Quiz/
+# [Code-Quiz](https://qlaub.github.io/Code-Quiz/)
 
 ## Purpose
 Take a timed quiz to test your basic knowledge of coding. Saves your top 5 scores!
