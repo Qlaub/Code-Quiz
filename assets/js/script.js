@@ -12,11 +12,23 @@ const titleScreenEl = document.getElementById("title-screen");
 const startGameBtn = document.getElementById("start-game");
 const mainEl = document.getElementById("main");
 const headerEl = document.getElementById('header');
+const bodyEl = document.getElementById('body');
+let clockCountdown = undefined;
+let answerClear = undefined;
 
 //random number generation
 const randomNum = function(min, max) {
   let num = Math.floor(Math.random() * (max + 1 - min)) + min;
   return num;
+}
+
+//decrements clock by one second
+const secondDown = function() {
+  secondsLeft = timeEl.textContent - 1;
+  timeEl.textContent = `${secondsLeft}`;
+  if (secondsLeft <= 0) {
+    return endGame();
+  }
 }
 
 //quiz questions
@@ -80,8 +92,54 @@ const clearScreen = function(objEl) {
   return;
 }
 
+const showUserAnswer = function(answer) {
+  let showContainer = document.getElementById('incorrect-correct-container')
+  //create show answer elements if on first question
+  if (answer === null && !showContainer) {
+    showContainer = document.createElement('section')
+    showContainer.id = 'incorrect-correct-container';
+    showContainer.style.display = 'none';
+    bodyEl.appendChild(showContainer);
+
+    const showAnswer = document.createElement('p');
+    showAnswer.id = 'incorrect-correct';
+    showContainer.appendChild(showAnswer);
+    return;
+  }
+  const previousAnswer = {
+    id: 'incorrect-correct',
+  }
+  clearTimeout(answerClear);
+  clearScreen(previousAnswer);
+  const showAnswer = document.getElementById('incorrect-correct');
+  if (answer) {
+    showContainer.style.display = 'flex';
+    showAnswer.style.display = 'flex';
+    showAnswer.textContent = `Correct!`
+  } else if (!answer) {
+    showContainer.style.display = 'flex';
+    showAnswer.style.display = 'flex';
+    showAnswer.textContent = `Incorrect!`
+  }
+  answerClear = setTimeout(clearAnswer, 5000);
+}
+
+const clearAnswer = function() {
+  answer = {
+    id: 'incorrect-correct-container',
+  }
+  clearScreen(answer);
+}
+
 //creates a new question at random on the screen
-const newQuestion = function(lastAnswerCorrect) {
+const newQuestion = function(lastAnswerBoolean) {
+  showUserAnswer(lastAnswerBoolean);
+
+  //clock starts counting down
+  if (clockCountdown === undefined) {
+    clockCountdown = setInterval(secondDown, 1000);
+  }
+
   const question = chooseQuestion();
   const questionContainerEl = document.getElementById('question-container');
   if ((questionContainerEl) && questionContainerEl.style.display === 'none') {
@@ -183,12 +241,21 @@ const checkQuestion = function(event) {
     currentTime = parseInt(timeEl.textContent);
     timeEl.textContent = `${currentTime - 10}`;
 
+    //stops game if time is below zero after answering incorrectly
+    if (currentTime <= 0) {
+      return endGame();
+    }
+
     return newQuestion(false);
   }
   return newQuestion(true);
 }
 
 const endGame = function() {
+  //clears timeout function
+  clearTimeout(clockCountdown);
+  clockCountdown = undefined;
+
   //clears screen of questions
   const screenObj = {
     id: 'question-container',
@@ -289,6 +356,7 @@ const logScore = function() {
     //if high scores already exist, see if user has new high score
     console.log("Comparing user score to current high scores")
     compareScores(userData, currentHighScores);
+    return true;
   }
   //clears user input
   const inputEl = document.getElementById('initials-input');
@@ -297,6 +365,9 @@ const logScore = function() {
 }
 
 const highScorePage = function() {
+  clearTimeout(clockCountdown);
+  clockCountdown = undefined;
+  clearAnswer();
   //finds first child element of main body that is being displayed
   //needs to be fixed because it will find elements with display: none;
   //going from questions to view high scores will not get rid of questions pages as a result
@@ -393,6 +464,12 @@ const compareScores = function(currentScore, highScores) {
       //log last index of tied high score
     } else if (highScores[i][1] === currentScore[1]) {
       index = i
+      //user has a high score that is lower than all other high scores
+    } else if (i+1 == highScores.length) {
+      highScores.splice(highScores.length, 0, currentScore);
+      console.log("lowest high score inserted")
+      localStorage.setItem(highScoreKey, JSON.stringify(highScores));
+      return;
     }
   }
   //update tied high score into lowest tied spot
