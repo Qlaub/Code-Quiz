@@ -79,6 +79,7 @@ const startGame = function() {
 
 //clears current content(s) on screen
 const clearScreen = function(objEl) {
+  debugger;
   //create array filled with object values
   objValues = Object.values(objEl);
 
@@ -125,10 +126,13 @@ const showUserAnswer = function(answer) {
 }
 
 const clearAnswer = function() {
-  answer = {
-    id: 'incorrect-correct-container',
+  const element = document.getElementById('incorrect-correct-container');
+  if (element) {
+    answer = {
+      id: 'incorrect-correct-container',
+    }
+    clearScreen(answer);
   }
-  clearScreen(answer);
 }
 
 //creates a new question at random on the screen
@@ -365,6 +369,7 @@ const logScore = function() {
 }
 
 const highScorePage = function() {
+  debugger;
   clearTimeout(clockCountdown);
   clockCountdown = undefined;
   clearAnswer();
@@ -413,10 +418,17 @@ const highScorePage = function() {
   const scores = JSON.parse(localStorage.getItem(highScoreKey));
 
   //list items
-  for (let i=0; i < scores.length; i++) {
+  if (scores != null) {
+    for (let i=0; i < scores.length; i++) {
+      let listItemEl = document.createElement('li');
+      listItemEl.className = 'high-score';
+      listItemEl.textContent = `${i+1}. ${scores[i][0]} - ${scores[i][1]}`;
+      scoreListEl.appendChild(listItemEl);
+    }
+  } else {
     let listItemEl = document.createElement('li');
     listItemEl.className = 'high-score';
-    listItemEl.textContent = `${i+1}. ${scores[i][0]} - ${scores[i][1]}`;
+    listItemEl.textContent = `No high scores!`;
     scoreListEl.appendChild(listItemEl);
   }
 
@@ -524,6 +536,11 @@ const updateScorePage = function() {
       listItemEl.textContent = `${i+1}. ${scores[i][0]} - ${scores[i][1]}`;
       scoreListEl.appendChild(listItemEl);
     }
+  } else {
+    let listItemEl = document.createElement('li');
+    listItemEl.className = 'high-score';
+    listItemEl.textContent = `No high scores!`;
+    scoreListEl.appendChild(listItemEl);
   }
 
   //show page elements
