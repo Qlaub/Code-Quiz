@@ -12,7 +12,7 @@ Take a timed quiz to test your basic knowledge of coding. Saves your top 5 score
 ## Web Application
 [Click here to view](https://qlaub.github.io/Code-Quiz/)
 
-
+https://user-images.githubusercontent.com/89796902/157805201-8d8d108c-b6d0-4c93-bc5b-cea78f97f8bd.mp4
 
 ## Developed Using
 - JavaScript
