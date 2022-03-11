@@ -5,7 +5,8 @@
 //add time to timer
 //start counting down timer
 
-const highScoreEl = document.getElementById("highscore");
+const viewHighScoreEl = document.getElementById("highscore");
+const viewScoreContainerEl = document.getElementById('highscore-box')
 const timeEl = document.getElementById("time");
 const titleScreenEl = document.getElementById("title-screen");
 const startGameBtn = document.getElementById("start-game");
@@ -202,6 +203,9 @@ const endGame = function() {
     let finalScore = parseInt(timeEl.innerText);
     const endScoreEl = document.getElementById('final-score-display');
     endScoreEl.textContent = `Your final score is ${finalScore}`;
+    //empty input field
+    const inputEl = document.getElementById('initials-input');
+    inputEl.value = '';
     return;
   }
 
@@ -258,11 +262,6 @@ const scoreSubmit = function() {
   if (check === false) {
     return;
   }
-  const page = {
-    id1: 'header',
-    id2: 'end-container',
-  };
-  clearScreen(page);
   return highScorePage();
 }
 
@@ -298,6 +297,25 @@ const logScore = function() {
 }
 
 const highScorePage = function() {
+  //finds first child element of main body that is being displayed
+  //needs to be fixed because it will find elements with display: none;
+  //going from questions to view high scores will not get rid of questions pages as a result
+  //find way to iterate through child objects and only select one with display: flex and have it NOT be a text node
+  //possible way is to have it match 'nodeType == Node.ELEMENT_NODE'
+  const childrenEls = mainEl.children;
+  let chosenChild = undefined;
+  for (let i=0; i < childrenEls.length; i++) {
+    let childDisplay = childrenEls[i].style.display
+    if (childDisplay != 'none' && childrenEls[i].nodeType == Node.ELEMENT_NODE) {
+      chosenChild = childrenEls[i];
+      break;
+    }
+  }
+  const page = {
+    id1: 'header',
+    id2: chosenChild.id,
+  };
+  clearScreen(page);
   const questionPageEl = document.getElementById('score-parent-container')
   if ((questionPageEl) && questionPageEl.style.display === "none") {
     return updateScorePage();
@@ -421,19 +439,22 @@ const updateScorePage = function() {
     scoreListEl.removeChild(scoreListEl.lastChild);
   }
 
-  for (let i=0; i < scores.length; i++) {
-    let listItemEl = document.createElement('li');
-    listItemEl.className = 'high-score';
-    listItemEl.textContent = `${i+1}. ${scores[i][0]} - ${scores[i][1]}`;
-    scoreListEl.appendChild(listItemEl);
+  //if user has saved scores, update them
+  if (scores) {
+    for (let i=0; i < scores.length; i++) {
+      let listItemEl = document.createElement('li');
+      listItemEl.className = 'high-score';
+      listItemEl.textContent = `${i+1}. ${scores[i][0]} - ${scores[i][1]}`;
+      scoreListEl.appendChild(listItemEl);
+    }
   }
 
   //show page elements
   if (questionPageEl.style.display === 'none') {
     questionPageEl.style.display = 'flex';
   }
-  
   return;
 }
 
+viewScoreContainerEl.addEventListener('click', highScorePage)
 startGameBtn.addEventListener('click', startGame)
