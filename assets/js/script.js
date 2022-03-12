@@ -248,6 +248,7 @@ const checkQuestion = function() {
   return newQuestion(true);
 }
 
+
 //page user sees their score and enters initials
 const endGame = function() {
   //stop the clock and reset it
@@ -292,7 +293,7 @@ const endGame = function() {
   endScreenEl.appendChild(endScoreEl);
 
   //container to hold user initials submission
-  const submitContainerEl = document.createElement('div');
+  const submitContainerEl = document.createElement('form');
   submitContainerEl.id = 'submit-container'
   endScreenEl.appendChild(submitContainerEl);
 
@@ -303,22 +304,26 @@ const endGame = function() {
 
   //input element
   const inputEl = document.createElement('input');
+  inputEl.type = 'text';
   inputEl.id = 'initials-input';
   submitContainerEl.appendChild(inputEl);
 
   //button element
   const submitBtnEl = document.createElement('button');
+  submitBtnEl.type = 'submit';
   submitBtnEl.id = 'submit-btn';
   submitBtnEl.innerText = "Submit"
   submitContainerEl.appendChild(submitBtnEl);
   //listens for click on submit button
-  submitBtnEl.addEventListener('click', scoreSubmit);
+  submitContainerEl.addEventListener('submit', scoreSubmit);
 
   //append everything to main page
   mainEl.appendChild(endScreenEl);
 }
 
-const scoreSubmit = function() {
+const scoreSubmit = function(event) {
+  event.preventDefault();
+  
   //checks if user has inputted anything into input box
   const check = logScore();
   if (check === false) {
